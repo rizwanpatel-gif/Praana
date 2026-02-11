@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: praana-backend
+    runtime: go
+    rootDir: backend
+    buildCommand: go build -o server ./cmd/server
+    startCommand: ./server
+    envVars:
+      - key: SERVER_PORT
+        value: 8080
+      - key: GIN_MODE
+        value: release
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://praana.vercel.app
+      - key: REDIS_ADDR
+        fromService:
+          name: praana-redis
+          type: redis
+          property: connectionString
+
+  - type: redis
+    name: praana-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru

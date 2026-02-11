@@ -1,0 +1,63 @@
+# ===== OS =====
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# ===== IDEs =====
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+
+# ===== Environment & Secrets =====
+.env
+.env.local
+.env.production
+.env.*.local
+*.pem
+*.key
+*.cert
+credentials.json
+secrets.json
+
+# ===== Go Backend =====
+backend/tmp/
+backend/vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+__debug_bin*
+
+# ===== Node / Angular Frontend =====
+node_modules/
+dist/
+.angular/
+.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ===== Build Artifacts =====
+*.log
+coverage/
+.nyc_output/
+e2e-results/
+
+# ===== Docker =====
+docker-compose.override.yml
+
+# ===== Misc =====
+*.tmp
+*.temp
+.claude/

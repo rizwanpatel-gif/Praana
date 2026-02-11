@@ -1,0 +1,223 @@
+// Custom Theming for Angular Material - Pastel Pink
+@use '@angular/material' as mat;
+
+@import "tailwindcss";
+
+// Define custom pink palette
+$praana-pink: (
+  50: #fdf2f8,
+  100: #fce7f3,
+  200: #fbcfe8,
+  300: #f9a8d4,
+  400: #f472b6,
+  500: #ec4899,
+  600: #db2777,
+  700: #be185d,
+  800: #9d174d,
+  900: #831843,
+);
+
+html {
+  @include mat.theme((
+    color: (
+      theme-type: light,
+      primary: mat.$magenta-palette,
+      tertiary: mat.$violet-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+:root {
+  --pink-50: #fdf2f8;
+  --pink-100: #fce7f3;
+  --pink-200: #fbcfe8;
+  --pink-300: #f9a8d4;
+  --pink-400: #f472b6;
+  --pink-500: #ec4899;
+  --pink-600: #db2777;
+  --rose-50: #fff1f2;
+  --rose-100: #ffe4e6;
+  --violet-50: #f5f3ff;
+  --violet-100: #ede9fe;
+}
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+  background: #fdf2f8;
+  color: #1e1b2e;
+}
+
+// ===== 2026 GLASSMORPHISM CARDS =====
+.glass-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(236, 72, 153, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+
+  &:hover {
+    box-shadow: 0 12px 40px rgba(236, 72, 153, 0.14);
+    transform: translateY(-2px);
+  }
+}
+
+// ===== OVERRIDE MAT-CARD GLOBALLY =====
+.mat-mdc-card {
+  border-radius: 16px !important;
+  box-shadow: 0 4px 24px rgba(236, 72, 153, 0.06) !important;
+  border: 1px solid rgba(251, 207, 232, 0.4) !important;
+  overflow: hidden !important;
+}
+
+// ===== STATUS CHIPS =====
+.status-critical {
+  background: #ffe4e6 !important;
+  color: #9f1239 !important;
+  border: 1px solid #fecdd3;
+}
+
+.status-warning {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+  border: 1px solid #fde68a;
+}
+
+.status-stable {
+  background: #d1fae5 !important;
+  color: #065f46 !important;
+  border: 1px solid #a7f3d0;
+}
+
+.status-active {
+  background: #fce7f3 !important;
+  color: #9d174d !important;
+  border: 1px solid #fbcfe8;
+}
+
+// ===== BUTTONS =====
+.mat-mdc-unelevated-button.mat-primary {
+  background: linear-gradient(135deg, #ec4899, #db2777) !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.3) !important;
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.45) !important;
+    transform: translateY(-1px);
+  }
+}
+
+.mat-mdc-outlined-button {
+  border-radius: 12px !important;
+  border-color: #fbcfe8 !important;
+  color: #db2777 !important;
+
+  &:hover {
+    background: #fdf2f8 !important;
+  }
+}
+
+// ===== FORM FIELDS =====
+.mat-mdc-form-field {
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: #fbcfe8 !important;
+  }
+
+  &.mat-focused {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: #ec4899 !important;
+    }
+  }
+
+  .mdc-floating-label {
+    color: #9d174d !important;
+  }
+}
+
+// ===== SIDEBAR NAV =====
+.mat-mdc-list-item.mdc-list-item {
+  border-radius: 12px !important;
+  margin: 2px 8px !important;
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    background: rgba(251, 207, 232, 0.3) !important;
+  }
+}
+
+// ===== MAT-TABS PINK =====
+.mat-mdc-tab-group {
+  .mat-mdc-tab.mdc-tab--active {
+    .mdc-tab__text-label {
+      color: #db2777 !important;
+    }
+  }
+  .mat-mdc-tab-header {
+    .mdc-tab-indicator__content--underline {
+      border-color: #ec4899 !important;
+    }
+  }
+}
+
+// ===== SCROLLBAR =====
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #fdf2f8; }
+::-webkit-scrollbar-thumb { background: #f9a8d4; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #f472b6; }
+
+// ===== GLOBAL OVERFLOW FIX =====
+* {
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6, p, span, a, label, td, th {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.mat-mdc-card {
+  overflow: hidden !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+.mat-mdc-card-content,
+.mat-mdc-card-header,
+.mat-mdc-card-title,
+.mat-mdc-card-subtitle {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-width: 0 !important;
+}
+
+// ===== UTILITY =====
+.text-overflow-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
