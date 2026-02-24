@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd frontend/praana && npx ng build --configuration production",
+  "outputDirectory": "frontend/praana/dist/praana/browser",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
