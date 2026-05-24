@@ -2,10 +2,6 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -15,81 +11,96 @@ import { Patient } from '../../../core/models';
 @Component({
   selector: 'app-vitals-entry',
   standalone: true,
-  imports: [
-    CommonModule, FormsModule,
-    MatCardModule, MatFormFieldModule, MatInputModule,
-    MatButtonModule, MatIconModule, MatSnackBarModule, MatProgressSpinnerModule,
-  ],
+  imports: [CommonModule, FormsModule, MatIconModule, MatSnackBarModule, MatProgressSpinnerModule],
   template: `
-    <h2 class="text-2xl font-bold bg-gradient-to-r from-pink-600 to-rose-500 bg-clip-text text-transparent mb-1">Record Vitals</h2>
-    @if (patient()) {
-      <p class="text-pink-400 text-sm mb-6">{{ patient()!.name }} &middot; Bed {{ patient()!.bed_number }}</p>
-    }
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">Record Vitals</h2>
+      @if (patient()) {
+        <p class="text-gray-500 text-sm mt-0.5">{{ patient()!.name }} &middot; Bed {{ patient()!.bed_number }}</p>
+      }
+    </div>
 
-    <div class="glass-card max-w-2xl p-6">
+    <div class="prana-card max-w-2xl p-6">
       @if (error()) {
-        <div class="error-toast mb-4">
-          <mat-icon class="!text-base mr-2">error_outline</mat-icon>
-          {{ error() }}
+        <div class="alert-error mb-5">
+          <mat-icon class="!text-base flex-shrink-0">error_outline</mat-icon>
+          <span>{{ error() }}</span>
         </div>
       }
-      <form (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
-        <div class="grid grid-cols-2 gap-4">
-          <mat-form-field appearance="outline">
-            <mat-label>Heart Rate (bpm)</mat-label>
-            <input matInput type="number" [(ngModel)]="form.heart_rate" name="heart_rate" min="0" max="300">
-            <mat-icon matSuffix class="!text-pink-300">favorite</mat-icon>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>SpO2 (%)</mat-label>
-            <input matInput type="number" [(ngModel)]="form.spo2" name="spo2" min="0" max="100">
-            <mat-icon matSuffix class="!text-pink-300">air</mat-icon>
-          </mat-form-field>
+
+      <form (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="form-group">
+            <label class="form-label">Heart Rate (bpm)</label>
+            <input class="form-input" type="number" [(ngModel)]="form.heart_rate" name="heart_rate" min="0" max="300">
+          </div>
+          <div class="form-group">
+            <label class="form-label">SpO2 (%)</label>
+            <input class="form-input" type="number" [(ngModel)]="form.spo2" name="spo2" min="0" max="100">
+          </div>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <mat-form-field appearance="outline">
-            <mat-label>Systolic BP (mmHg)</mat-label>
-            <input matInput type="number" [(ngModel)]="form.systolic_bp" name="systolic_bp" min="0" max="300">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Diastolic BP (mmHg)</mat-label>
-            <input matInput type="number" [(ngModel)]="form.diastolic_bp" name="diastolic_bp" min="0" max="200">
-          </mat-form-field>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="form-group">
+            <label class="form-label">Systolic BP (mmHg)</label>
+            <input class="form-input" type="number" [(ngModel)]="form.systolic_bp" name="systolic_bp" min="0" max="300">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Diastolic BP (mmHg)</label>
+            <input class="form-input" type="number" [(ngModel)]="form.diastolic_bp" name="diastolic_bp" min="0" max="200">
+          </div>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <mat-form-field appearance="outline">
-            <mat-label>Temperature (°C)</mat-label>
-            <input matInput type="number" [(ngModel)]="form.temperature" name="temperature" min="30" max="45" step="0.1">
-            <mat-icon matSuffix class="!text-pink-300">thermostat</mat-icon>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Respiratory Rate (/min)</mat-label>
-            <input matInput type="number" [(ngModel)]="form.respiratory_rate" name="respiratory_rate" min="0" max="60">
-          </mat-form-field>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="form-group">
+            <label class="form-label">Temperature (°C)</label>
+            <input class="form-input" type="number" [(ngModel)]="form.temperature" name="temperature" min="30" max="45" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Respiratory Rate (/min)</label>
+            <input class="form-input" type="number" [(ngModel)]="form.respiratory_rate" name="respiratory_rate" min="0" max="60">
+          </div>
         </div>
-        <mat-form-field appearance="outline">
-          <mat-label>Notes</mat-label>
-          <input matInput [(ngModel)]="form.notes" name="notes">
-          <mat-icon matPrefix class="!text-pink-300 mr-2">notes</mat-icon>
-        </mat-form-field>
-        <div class="flex gap-4 mt-2">
-          <button mat-flat-button color="primary" type="submit" [disabled]="saving()" class="!rounded-xl !h-12 !px-8">
+
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <input class="form-input" type="text" [(ngModel)]="form.notes" name="notes">
+        </div>
+
+        <div class="flex gap-3 pt-4 border-t border-gray-100">
+          <button type="submit" [disabled]="saving()" class="submit-btn">
             @if (saving()) {
-              <mat-spinner diameter="20"></mat-spinner>
+              <mat-spinner diameter="18"></mat-spinner>
             } @else {
               Save Vitals
             }
           </button>
-          <button mat-stroked-button type="button" (click)="onCancel()" class="!rounded-xl !h-12">Cancel</button>
+          <button type="button" (click)="onCancel()" class="cancel-btn">Cancel</button>
         </div>
       </form>
     </div>
   `,
   styles: [`
-    .error-toast {
-      background: #fff1f2; color: #9f1239; padding: 10px 14px;
-      border-radius: 12px; font-size: 13px;
-      display: flex; align-items: center; border: 1px solid #fecdd3;
+    .alert-error {
+      background: #fff1f2; color: #b91c1c; padding: 10px 14px;
+      border-radius: 8px; font-size: 13px;
+      display: flex; align-items: center; gap: 8px; border: 1px solid #fecaca;
+    }
+    .submit-btn {
+      height: 42px; padding: 0 24px;
+      background: #db2777; color: #ffffff;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600; font-family: inherit;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+      &:hover:not(:disabled) { background: #be185d; }
+      &:disabled { opacity: 0.6; cursor: not-allowed; }
+    }
+    .cancel-btn {
+      height: 42px; padding: 0 20px;
+      background: #ffffff; color: #374151;
+      border: 1.5px solid #d1d5db; border-radius: 8px;
+      font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer;
+      &:hover { background: #f9fafb; }
     }
   `]
 })

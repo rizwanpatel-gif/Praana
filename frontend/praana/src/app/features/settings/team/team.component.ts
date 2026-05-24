@@ -1,15 +1,9 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../../core/services/api.service';
@@ -20,94 +14,115 @@ import { User } from '../../../core/models';
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatButtonModule, MatIconModule, MatTableModule, MatChipsModule,
-    MatDialogModule, MatSnackBarModule, MatProgressSpinnerModule,
+    MatButtonModule, MatIconModule, MatTableModule,
+    MatSnackBarModule, MatProgressSpinnerModule,
   ],
   template: `
-    <h2 class="text-2xl font-bold bg-gradient-to-r from-pink-600 to-rose-500 bg-clip-text text-transparent mb-6">Team Management</h2>
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">Team Management</h2>
+      <p class="text-gray-500 text-sm mt-0.5">Invite and manage team members</p>
+    </div>
 
     <!-- Invite form -->
-    <div class="glass-card p-5 mb-6 max-w-xl">
-      <h3 class="text-sm font-semibold text-pink-600 uppercase tracking-wider mb-4">
-        <mat-icon class="!text-base align-middle mr-1">send</mat-icon> Invite Team Member
-      </h3>
+    <div class="prana-card p-5 mb-5 max-w-2xl">
+      <p class="section-label mb-4">Invite Team Member</p>
+
       @if (inviteCode()) {
-        <div class="success-toast mb-4">
-          <mat-icon class="!text-base mr-2">check_circle</mat-icon>
+        <div class="alert-success mb-4">
+          <mat-icon class="!text-base flex-shrink-0">check_circle</mat-icon>
           <div>
-            <p class="font-medium">Invite sent!</p>
-            <p class="text-sm mt-0.5">Code: <strong>{{ inviteCode() }}</strong></p>
-            <p class="text-xs opacity-70 mt-0.5">(In production, this would be emailed)</p>
+            <p class="font-medium">Invite created</p>
+            <p class="text-sm mt-0.5">Code: <strong class="font-mono">{{ inviteCode() }}</strong></p>
+            <p class="text-xs text-gray-400 mt-0.5">In production this would be emailed automatically</p>
           </div>
         </div>
       }
-      <form (ngSubmit)="onInvite()" class="flex gap-4 items-end">
-        <mat-form-field appearance="outline" class="flex-1">
-          <mat-label>Email</mat-label>
-          <input matInput type="email" [(ngModel)]="inviteEmail" name="email" required>
-          <mat-icon matPrefix class="!text-pink-300 mr-2">email</mat-icon>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Role</mat-label>
-          <mat-select [(ngModel)]="inviteRole" name="role" required>
-            <mat-option value="doctor">Doctor</mat-option>
-            <mat-option value="nurse">Nurse</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <button mat-flat-button color="primary" type="submit" class="!h-14 !rounded-xl">
-          <mat-icon>send</mat-icon> Invite
+
+      <form (ngSubmit)="onInvite()" class="flex flex-wrap gap-4 items-end">
+        <div class="form-group flex-1 min-w-48">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" [(ngModel)]="inviteEmail" name="email" required>
+        </div>
+        <div class="form-group" style="width: 140px">
+          <label class="form-label">Role</label>
+          <select class="form-input" [(ngModel)]="inviteRole" name="role" required>
+            <option value="doctor">Doctor</option>
+            <option value="nurse">Nurse</option>
+          </select>
+        </div>
+        <button type="submit" class="invite-btn">
+          <mat-icon class="!text-base">send</mat-icon> Send Invite
         </button>
       </form>
     </div>
 
     <!-- Members list -->
     @if (loading()) {
-      <div class="flex justify-center py-12"><mat-spinner></mat-spinner></div>
+      <div class="flex justify-center py-12"><mat-spinner diameter="36"></mat-spinner></div>
     } @else {
-      <div class="glass-card overflow-hidden">
-        <div class="px-5 pt-5 pb-3">
-          <h3 class="text-sm font-semibold text-pink-600 uppercase tracking-wider">
-            <mat-icon class="!text-base align-middle mr-1">groups</mat-icon> Members ({{ members().length }})
-          </h3>
+      <div class="prana-card overflow-hidden">
+        <div class="px-5 pt-5 pb-3 border-b border-gray-100">
+          <p class="section-label">Members ({{ members().length }})</p>
         </div>
-        <table mat-table [dataSource]="members()" class="w-full">
+        <div class="overflow-x-auto">
+        <table mat-table [dataSource]="members()" style="width: 100%; min-width: 420px;">
           <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef class="!text-pink-600 !font-semibold">Name</th>
-            <td mat-cell *matCellDef="let m">{{ m.name }}</td>
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let m" class="font-medium text-gray-800">{{ m.name }}</td>
           </ng-container>
           <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef class="!text-pink-600 !font-semibold">Email</th>
-            <td mat-cell *matCellDef="let m" class="text-gray-600">{{ m.email }}</td>
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let m" class="text-gray-500 text-sm">{{ m.email }}</td>
           </ng-container>
           <ng-container matColumnDef="role">
-            <th mat-header-cell *matHeaderCellDef class="!text-pink-600 !font-semibold">Role</th>
+            <th mat-header-cell *matHeaderCellDef>Role</th>
             <td mat-cell *matCellDef="let m">
-              <span class="text-xs font-semibold uppercase px-3 py-1 rounded-full"
-                [class]="m.role === 'admin' ? 'status-active' : 'status-stable'">{{ m.role }}</span>
+              <span class="role-badge" [class.role-badge--admin]="m.role === 'admin'">{{ m.role }}</span>
             </td>
           </ng-container>
           <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef class="!text-pink-600 !font-semibold">Actions</th>
+            <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let m">
               @if (m.role !== 'admin') {
-                <button mat-icon-button class="!text-rose-400" (click)="removeMember(m.id)">
-                  <mat-icon>delete</mat-icon>
+                <button mat-icon-button class="!text-gray-400 hover:!text-red-500" (click)="removeMember(m.id)">
+                  <mat-icon class="!text-base">delete</mat-icon>
                 </button>
               }
             </td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:!bg-pink-50/50 transition-colors"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:!bg-gray-50"></tr>
         </table>
+        </div>
       </div>
     }
   `,
   styles: [`
-    .success-toast {
+    .section-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #6b7280; margin: 0;
+    }
+    .alert-success {
       background: #ecfdf5; color: #065f46; padding: 12px 14px;
-      border-radius: 12px; font-size: 13px;
-      display: flex; align-items: flex-start; border: 1px solid #a7f3d0;
+      border-radius: 8px; font-size: 13px;
+      display: flex; align-items: flex-start; gap: 8px; border: 1px solid #a7f3d0;
+    }
+    .invite-btn {
+      height: 42px; padding: 0 20px;
+      background: #db2777; color: #ffffff;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600; font-family: inherit;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      align-self: flex-end;
+      &:hover { background: #be185d; }
+    }
+    .role-badge {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 4px;
+      background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0;
+    }
+    .role-badge--admin {
+      background: #fce7f3; color: #9d174d; border: 1px solid #fbcfe8;
     }
   `]
 })
@@ -121,9 +136,7 @@ export class TeamComponent implements OnInit {
 
   constructor(private api: ApiService, private snackBar: MatSnackBar) {}
 
-  ngOnInit() {
-    this.loadMembers();
-  }
+  ngOnInit() { this.loadMembers(); }
 
   loadMembers() {
     this.api.getMembers().subscribe(res => {
@@ -136,14 +149,9 @@ export class TeamComponent implements OnInit {
     this.inviteCode.set('');
     this.api.createInvite(this.inviteEmail, this.inviteRole).subscribe({
       next: (res) => {
-        if (res.success && res.data) {
-          this.inviteCode.set(res.data.code);
-          this.inviteEmail = '';
-        }
+        if (res.success && res.data) { this.inviteCode.set(res.data.code); this.inviteEmail = ''; }
       },
-      error: (err) => {
-        this.snackBar.open(err.error?.error || 'Failed to create invite', 'OK', { duration: 3000 });
-      }
+      error: (err) => { this.snackBar.open(err.error?.error || 'Failed to create invite', 'OK', { duration: 3000 }); }
     });
   }
 
@@ -151,14 +159,9 @@ export class TeamComponent implements OnInit {
     if (!confirm('Remove this team member?')) return;
     this.api.removeMember(id).subscribe({
       next: (res) => {
-        if (res.success) {
-          this.snackBar.open('Member removed', 'OK', { duration: 2000 });
-          this.loadMembers();
-        }
+        if (res.success) { this.snackBar.open('Member removed', 'OK', { duration: 2000 }); this.loadMembers(); }
       },
-      error: (err) => {
-        this.snackBar.open(err.error?.error || 'Failed', 'OK', { duration: 3000 });
-      }
+      error: (err) => { this.snackBar.open(err.error?.error || 'Failed', 'OK', { duration: 3000 }); }
     });
   }
 }

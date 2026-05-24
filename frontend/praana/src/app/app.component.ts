@@ -1,13 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { AuthService } from './core/services/auth.service';
 import { WebSocketService } from './core/services/websocket.service';
+import { DemoService } from './core/services/demo.service';
 
 @Component({
   selector: 'app-root',
@@ -20,35 +22,39 @@ import { WebSocketService } from './core/services/websocket.service';
   template: `
     @if (auth.isLoggedIn()) {
       <mat-sidenav-container class="h-screen">
-        <mat-sidenav mode="side" opened class="sidebar">
+        <mat-sidenav #sidenav [mode]="isMobile() ? 'over' : 'side'" [opened]="!isMobile()" class="sidebar">
           <!-- Logo -->
           <div class="sidebar-header">
-            <div class="logo-pill">
-              <mat-icon class="!text-pink-500">favorite</mat-icon>
+            <div class="logo-icon">
+              <mat-icon class="!text-pink-600 !text-xl">favorite</mat-icon>
             </div>
             <div class="ml-3 min-w-0">
-              <h1 class="text-lg font-bold bg-gradient-to-r from-pink-500 to-rose-400 bg-clip-text text-transparent leading-tight">
-                Praana
-              </h1>
-              <p class="text-xs text-pink-300 truncate">{{ auth.user()?.name }}</p>
+              <div class="flex items-center gap-1.5">
+                <h1 class="text-base font-bold text-gray-900 leading-tight">Praana</h1>
+                @if (demo.isActive()) {
+                  <span class="demo-chip">DEMO</span>
+                }
+              </div>
+              <p class="text-xs text-gray-400 truncate">{{ auth.user()?.name }}</p>
             </div>
           </div>
 
           <!-- Nav -->
-          <nav class="px-3 py-4 flex flex-col gap-1">
-            <a class="nav-item" routerLink="/dashboard" routerLinkActive="nav-active">
+          <nav class="px-3 py-3 flex flex-col gap-0.5">
+            <p class="nav-section-label">Main</p>
+            <a class="nav-item" routerLink="/dashboard" routerLinkActive="nav-active" (click)="closeMobile(sidenav)">
               <mat-icon class="nav-icon">space_dashboard</mat-icon>
               <span>Dashboard</span>
             </a>
-            <a class="nav-item" routerLink="/patients" routerLinkActive="nav-active">
+            <a class="nav-item" routerLink="/patients" routerLinkActive="nav-active" (click)="closeMobile(sidenav)">
               <mat-icon class="nav-icon">groups</mat-icon>
               <span>Patients</span>
             </a>
-            <a class="nav-item" routerLink="/vitals/quick-entry" routerLinkActive="nav-active">
+            <a class="nav-item" routerLink="/vitals/quick-entry" routerLinkActive="nav-active" (click)="closeMobile(sidenav)">
               <mat-icon class="nav-icon">monitor_heart</mat-icon>
               <span>Quick Entry</span>
             </a>
-            <a class="nav-item" routerLink="/alerts" routerLinkActive="nav-active">
+            <a class="nav-item" routerLink="/alerts" routerLinkActive="nav-active" (click)="closeMobile(sidenav)">
               <mat-icon class="nav-icon">notifications_active</mat-icon>
               <span>Alerts</span>
               @if (ws.alerts().length > 0) {
@@ -58,16 +64,16 @@ import { WebSocketService } from './core/services/websocket.service';
 
             @if (auth.isAdmin()) {
               <div class="nav-divider"></div>
-              <p class="text-[10px] uppercase tracking-widest text-pink-300 px-3 mb-1">Admin</p>
-              <a class="nav-item" routerLink="/alerts/thresholds" routerLinkActive="nav-active">
+              <p class="nav-section-label">Admin</p>
+              <a class="nav-item" routerLink="/alerts/thresholds" routerLinkActive="nav-active" (click)="closeMobile(sidenav)">
                 <mat-icon class="nav-icon">tune</mat-icon>
                 <span>Thresholds</span>
               </a>
-              <a class="nav-item" routerLink="/settings" routerLinkActive="nav-active">
+              <a class="nav-item" routerLink="/settings" routerLinkActive="nav-active" (click)="closeMobile(sidenav)">
                 <mat-icon class="nav-icon">settings</mat-icon>
                 <span>Settings</span>
               </a>
-              <a class="nav-item" routerLink="/settings/team" routerLinkActive="nav-active">
+              <a class="nav-item" routerLink="/settings/team" routerLinkActive="nav-active" (click)="closeMobile(sidenav)">
                 <mat-icon class="nav-icon">group_add</mat-icon>
                 <span>Team</span>
               </a>
@@ -76,7 +82,7 @@ import { WebSocketService } from './core/services/websocket.service';
 
           <!-- Logout -->
           <div class="sidebar-footer">
-            <button class="nav-item w-full justify-center !text-pink-400" (click)="auth.logout()">
+            <button class="nav-item w-full text-gray-500" (click)="auth.logout()">
               <mat-icon class="nav-icon">logout</mat-icon>
               <span>Sign Out</span>
             </button>
@@ -84,19 +90,38 @@ import { WebSocketService } from './core/services/websocket.service';
         </mat-sidenav>
 
         <mat-sidenav-content class="main-content">
+          <!-- Mobile top bar -->
+          @if (isMobile()) {
+            <div class="mobile-topbar">
+              <button class="menu-btn" (click)="sidenav.toggle()">
+                <mat-icon>menu</mat-icon>
+              </button>
+              <div class="flex items-center gap-2">
+                <div class="logo-icon-sm">
+                  <mat-icon class="!text-pink-600 !text-base">favorite</mat-icon>
+                </div>
+                <span class="font-bold text-gray-900 text-base">Praana</span>
+              </div>
+              @if (ws.alerts().length > 0) {
+                <span class="alert-badge">{{ ws.alerts().length }}</span>
+              }
+            </div>
+          }
+
           <!-- Alert banner -->
           @if (ws.alerts().length > 0) {
-            <div class="alert-banner animate-fade-in">
+            <div class="alert-banner">
               <div class="flex items-center gap-2 min-w-0">
                 <mat-icon class="!text-lg flex-shrink-0">warning</mat-icon>
-                <span class="truncate text-sm">{{ ws.alerts()[0].message }}</span>
+                <span class="truncate text-sm font-medium">{{ ws.alerts()[0].message }}</span>
               </div>
               <button mat-icon-button class="!text-white flex-shrink-0" (click)="ws.clearAlert(ws.alerts()[0].id)">
                 <mat-icon>close</mat-icon>
               </button>
             </div>
           }
-          <div class="p-6 animate-fade-in">
+
+          <div class="page-content">
             <router-outlet />
           </div>
         </mat-sidenav-content>
@@ -110,128 +135,142 @@ import { WebSocketService } from './core/services/websocket.service';
 
     .sidebar {
       width: 240px;
-      background: rgba(255, 255, 255, 0.8) !important;
-      backdrop-filter: blur(20px);
-      border-right: 1px solid rgba(251, 207, 232, 0.4) !important;
+      background: #ffffff !important;
+      border-right: 1px solid #e5e7eb !important;
       overflow-x: hidden;
     }
 
     .sidebar-header {
       display: flex;
       align-items: center;
-      padding: 20px 16px;
-      border-bottom: 1px solid rgba(251, 207, 232, 0.3);
+      padding: 18px 16px;
+      border-bottom: 1px solid #f3f4f6;
       overflow: hidden;
     }
 
-    .logo-pill {
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #fce7f3, #fdf2f8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(236, 72, 153, 0.1);
+    .logo-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #fce7f3; border: 1px solid #fbcfe8;
+      display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
 
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 12px;
-      color: #6b7280;
-      font-size: 13px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      cursor: pointer;
-      border: none;
-      background: none;
+    .nav-section-label {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #9ca3af;
+      padding: 8px 12px 4px; margin: 0;
+    }
 
-      &:hover {
-        background: rgba(251, 207, 232, 0.25);
-        color: #db2777;
-      }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-radius: 8px;
+      color: #6b7280; font-size: 13.5px; font-weight: 500;
+      text-decoration: none; cursor: pointer;
+      border: none; background: none; width: 100%;
+      overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+
+      &:hover { background: #f9fafb; color: #374151; }
+      .nav-icon { color: inherit; }
     }
 
     .nav-active {
-      background: rgba(251, 207, 232, 0.35) !important;
+      background: #fdf2f8 !important;
       color: #db2777 !important;
-
-      .nav-icon { color: #ec4899 !important; }
     }
 
     .nav-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-      color: #9ca3af;
-      transition: color 0.2s;
+      font-size: 18px; width: 18px; height: 18px; flex-shrink: 0;
     }
 
-    .nav-divider {
-      height: 1px;
-      background: rgba(251, 207, 232, 0.3);
-      margin: 8px 12px;
+    .nav-divider { height: 1px; background: #f3f4f6; margin: 8px 0; }
+
+    .demo-chip {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+      padding: 1px 5px; border-radius: 4px;
+      background: #6366f1; color: #fff;
+      flex-shrink: 0;
     }
 
     .alert-badge {
       margin-left: auto;
-      background: linear-gradient(135deg, #ec4899, #f43f5e);
-      color: white;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 10px;
-      min-width: 20px;
-      text-align: center;
+      background: #db2777; color: white;
+      font-size: 11px; font-weight: 700;
+      padding: 1px 7px; border-radius: 10px;
+      min-width: 20px; text-align: center; flex-shrink: 0;
     }
 
     .sidebar-footer {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      padding: 12px;
-      border-top: 1px solid rgba(251, 207, 232, 0.3);
+      position: absolute; bottom: 0; width: 100%;
+      padding: 10px 12px; border-top: 1px solid #f3f4f6;
+      background: #ffffff;
     }
 
     .main-content {
-      background: linear-gradient(180deg, #fdf2f8 0%, #faf5ff 50%, #fff1f2 100%) !important;
+      background: #f7f8fa !important;
       overflow-x: hidden;
     }
 
+    .mobile-topbar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky; top: 0; z-index: 10;
+    }
+
+    .menu-btn {
+      background: none; border: none; cursor: pointer;
+      color: #374151; display: flex; align-items: center;
+      padding: 4px; border-radius: 6px;
+      &:hover { background: #f3f4f6; }
+    }
+
+    .logo-icon-sm {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: #fce7f3; border: 1px solid #fbcfe8;
+      display: flex; align-items: center; justify-content: center;
+    }
+
     .alert-banner {
-      background: linear-gradient(135deg, #ec4899, #f43f5e);
-      color: white;
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      background: #db2777; color: white;
+      padding: 10px 20px;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 8px;
+    }
+
+    .page-content {
+      padding: 16px;
+    }
+
+    @media (min-width: 768px) {
+      .page-content { padding: 24px; }
     }
   `]
 })
 export class AppComponent implements OnInit, OnDestroy {
+  isMobile = signal(false);
+
   constructor(
     public auth: AuthService,
     public ws: WebSocketService,
-    private snackBar: MatSnackBar,
+    public demo: DemoService,
+    private breakpointObserver: BreakpointObserver,
     private router: Router,
   ) {}
 
   ngOnInit() {
-    if (this.auth.isLoggedIn()) {
-      this.ws.connect();
-    }
+    if (this.auth.isLoggedIn()) this.ws.connect();
+
+    this.breakpointObserver.observe(['(max-width: 768px)']).subscribe(result => {
+      this.isMobile.set(result.matches);
+    });
   }
 
   ngOnDestroy() {
     this.ws.disconnect();
+  }
+
+  closeMobile(sidenav: MatSidenav) {
+    if (this.isMobile()) sidenav.close();
   }
 }

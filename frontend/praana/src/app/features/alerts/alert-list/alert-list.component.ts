@@ -21,48 +21,48 @@ import { format } from 'date-fns';
     MatChipsModule, MatTabsModule, MatProgressSpinnerModule, MatSnackBarModule,
   ],
   template: `
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
       <div>
-        <h2 class="text-2xl font-bold bg-gradient-to-r from-pink-600 to-rose-500 bg-clip-text text-transparent">Alerts</h2>
-        <p class="text-pink-300 text-sm">{{ activeAlerts().length }} active alerts</p>
+        <h2 class="text-xl font-bold text-gray-900">Alerts</h2>
+        <p class="text-gray-500 text-sm mt-0.5">{{ activeAlerts().length }} active alerts</p>
       </div>
       <a mat-stroked-button routerLink="/alerts/thresholds">
-        <mat-icon>tune</mat-icon> Configure Thresholds
+        <mat-icon class="!text-base">tune</mat-icon> Configure Thresholds
       </a>
     </div>
 
     <mat-tab-group>
       <mat-tab label="Active ({{ activeAlerts().length }})">
         @if (loading()) {
-          <div class="flex justify-center py-12"><mat-spinner></mat-spinner></div>
+          <div class="flex justify-center py-12"><mat-spinner diameter="36"></mat-spinner></div>
         } @else if (activeAlerts().length === 0) {
-          <div class="text-center py-12">
-            <mat-icon class="!text-6xl !w-16 !h-16 text-pink-200">check_circle</mat-icon>
-            <p class="mt-4 text-pink-300">No active alerts</p>
+          <div class="text-center py-16">
+            <div class="empty-icon-wrap">
+              <mat-icon class="!text-4xl !w-10 !h-10 text-gray-300">check_circle</mat-icon>
+            </div>
+            <p class="mt-4 text-gray-400 font-medium">All clear — no active alerts</p>
           </div>
         } @else {
           <div class="flex flex-col gap-3 mt-4">
             @for (alert of activeAlerts(); track alert.id) {
-              <div class="glass-card alert-card"
-                [style.border-left-color]="alert.severity === 'critical' ? '#f43f5e' : '#f59e0b'">
-                <div class="p-4 flex justify-between items-center">
-                  <div class="min-w-0">
-                    <div class="flex items-center gap-2">
-                      <span class="status-pill"
-                        [class]="alert.severity === 'critical' ? 'status-critical' : 'status-warning'">
+              <div class="alert-card" [class.alert-card--critical]="alert.severity === 'critical'" [class.alert-card--warning]="alert.severity !== 'critical'">
+                <div class="p-4 flex justify-between items-center gap-4">
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="status-badge" [class]="alert.severity === 'critical' ? 'status-critical' : 'status-warning'">
                         {{ alert.severity }}
                       </span>
-                      <span class="font-medium text-gray-700 truncate">{{ alert.message }}</span>
+                      <span class="font-medium text-gray-800 text-sm">{{ alert.message }}</span>
                     </div>
-                    <p class="text-xs text-pink-400 mt-1">
-                      <a [routerLink]="['/patients', alert.patient_id]" class="text-pink-600 hover:text-pink-800">
+                    <p class="text-xs text-gray-400 mt-1">
+                      <a [routerLink]="['/patients', alert.patient_id]" class="text-pink-600 hover:text-pink-800 font-medium">
                         {{ alert.patient_name }}
                       </a>
                       &middot; {{ formatTime(alert.created_at) }}
                     </p>
                   </div>
-                  <button mat-flat-button color="primary" (click)="acknowledge(alert.id)" class="!rounded-xl flex-shrink-0">
-                    <mat-icon>check</mat-icon> Acknowledge
+                  <button mat-flat-button color="primary" (click)="acknowledge(alert.id)" class="!rounded-lg !text-sm flex-shrink-0">
+                    <mat-icon class="!text-base">check</mat-icon> Acknowledge
                   </button>
                 </div>
               </div>
@@ -70,24 +70,23 @@ import { format } from 'date-fns';
           </div>
         }
       </mat-tab>
+
       <mat-tab label="History">
         <div class="flex flex-col gap-3 mt-4">
           @for (alert of alertHistory(); track alert.id) {
-            <div class="glass-card alert-card"
-              [style.border-left-color]="alert.acknowledged ? '#d1d5db' : '#f43f5e'">
-              <div class="p-4 flex justify-between items-center">
-                <div class="min-w-0">
-                  <span class="font-medium text-gray-700 truncate block">{{ alert.message }}</span>
-                  <p class="text-xs text-pink-400 mt-1">
+            <div class="prana-card">
+              <div class="p-4 flex justify-between items-center gap-4">
+                <div class="min-w-0 flex-1">
+                  <span class="font-medium text-gray-800 text-sm block truncate">{{ alert.message }}</span>
+                  <p class="text-xs text-gray-400 mt-1">
                     {{ formatTime(alert.created_at) }}
                     @if (alert.acknowledged) {
-                      &middot; Ack'd {{ formatTime(alert.acknowledged_at!) }}
+                      &middot; Acknowledged {{ formatTime(alert.acknowledged_at!) }}
                     }
                   </p>
                 </div>
-                <span class="status-pill flex-shrink-0"
-                  [class]="alert.acknowledged ? 'status-stable' : 'status-critical'">
-                  {{ alert.acknowledged ? 'Acknowledged' : 'Unacknowledged' }}
+                <span class="status-badge flex-shrink-0" [class]="alert.acknowledged ? 'status-stable' : 'status-critical'">
+                  {{ alert.acknowledged ? 'Acknowledged' : 'Pending' }}
                 </span>
               </div>
             </div>
@@ -97,12 +96,24 @@ import { format } from 'date-fns';
     </mat-tab-group>
   `,
   styles: [`
-    .alert-card {
-      border-left: 4px solid transparent;
+    .empty-icon-wrap {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: #f9fafb; border: 1px solid #e5e7eb;
+      display: inline-flex; align-items: center; justify-content: center;
     }
-    .status-pill {
+    .alert-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.03);
+      border-left: 3px solid #e5e7eb;
+      overflow: hidden;
+    }
+    .alert-card--critical { border-left-color: #ef4444; }
+    .alert-card--warning  { border-left-color: #f59e0b; }
+    .status-badge {
       font-size: 10px; font-weight: 600; text-transform: uppercase;
-      padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;
+      padding: 2px 8px; border-radius: 4px; letter-spacing: 0.4px;
     }
   `]
 })

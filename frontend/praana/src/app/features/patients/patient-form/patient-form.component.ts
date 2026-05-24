@@ -2,11 +2,6 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../../core/services/api.service';
@@ -14,77 +9,93 @@ import { ApiService } from '../../../core/services/api.service';
 @Component({
   selector: 'app-patient-form',
   standalone: true,
-  imports: [
-    CommonModule, FormsModule,
-    MatCardModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule,
-  ],
+  imports: [CommonModule, FormsModule, MatIconModule, MatProgressSpinnerModule],
   template: `
-    <h2 class="text-2xl font-bold bg-gradient-to-r from-pink-600 to-rose-500 bg-clip-text text-transparent mb-6">
-      {{ isEdit() ? 'Edit' : 'Add' }} Patient
-    </h2>
-    <div class="glass-card max-w-2xl p-6">
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">{{ isEdit() ? 'Edit' : 'Add' }} Patient</h2>
+      <p class="text-gray-500 text-sm mt-0.5">{{ isEdit() ? 'Update patient information' : 'Register a new patient' }}</p>
+    </div>
+
+    <div class="prana-card max-w-2xl p-6">
       @if (error()) {
-        <div class="error-toast mb-4">
-          <mat-icon class="!text-base mr-2">error_outline</mat-icon>
-          {{ error() }}
+        <div class="alert-error mb-5">
+          <mat-icon class="!text-base flex-shrink-0">error_outline</mat-icon>
+          <span>{{ error() }}</span>
         </div>
       }
-      <form (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
-        <mat-form-field appearance="outline">
-          <mat-label>Patient Name</mat-label>
-          <input matInput [(ngModel)]="form.name" name="name" required>
-          <mat-icon matPrefix class="!text-pink-300 mr-2">person</mat-icon>
-        </mat-form-field>
-        <div class="grid grid-cols-2 gap-4">
-          <mat-form-field appearance="outline">
-            <mat-label>Age</mat-label>
-            <input matInput type="number" [(ngModel)]="form.age" name="age" required min="0" max="150">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Gender</mat-label>
-            <mat-select [(ngModel)]="form.gender" name="gender" required>
-              <mat-option value="male">Male</mat-option>
-              <mat-option value="female">Female</mat-option>
-              <mat-option value="other">Other</mat-option>
-            </mat-select>
-          </mat-form-field>
+
+      <form (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+        <div class="form-group">
+          <label class="form-label">Patient Name</label>
+          <input class="form-input" type="text" [(ngModel)]="form.name" name="name" required>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <mat-form-field appearance="outline">
-            <mat-label>Bed Number</mat-label>
-            <input matInput [(ngModel)]="form.bed_number" name="bed_number">
-            <mat-icon matPrefix class="!text-pink-300 mr-2">bed</mat-icon>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Ward</mat-label>
-            <input matInput [(ngModel)]="form.ward" name="ward">
-            <mat-icon matPrefix class="!text-pink-300 mr-2">location_on</mat-icon>
-          </mat-form-field>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="form-group">
+            <label class="form-label">Age</label>
+            <input class="form-input" type="number" [(ngModel)]="form.age" name="age" required min="0" max="150">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select class="form-input" [(ngModel)]="form.gender" name="gender" required>
+              <option value="">Select</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
         </div>
-        <mat-form-field appearance="outline">
-          <mat-label>Diagnosis</mat-label>
-          <input matInput [(ngModel)]="form.diagnosis" name="diagnosis">
-          <mat-icon matPrefix class="!text-pink-300 mr-2">medical_information</mat-icon>
-        </mat-form-field>
-        <div class="flex gap-4 mt-2">
-          <button mat-flat-button color="primary" type="submit" [disabled]="saving()" class="!rounded-xl !h-12 !px-8">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="form-group">
+            <label class="form-label">Bed Number</label>
+            <input class="form-input" type="text" [(ngModel)]="form.bed_number" name="bed_number">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ward</label>
+            <input class="form-input" type="text" [(ngModel)]="form.ward" name="ward">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Diagnosis</label>
+          <input class="form-input" type="text" [(ngModel)]="form.diagnosis" name="diagnosis">
+        </div>
+
+        <div class="flex gap-3 pt-4 border-t border-gray-100">
+          <button type="submit" [disabled]="saving()" class="submit-btn">
             @if (saving()) {
-              <mat-spinner diameter="20"></mat-spinner>
+              <mat-spinner diameter="18"></mat-spinner>
             } @else {
               {{ isEdit() ? 'Update' : 'Add' }} Patient
             }
           </button>
-          <button mat-stroked-button type="button" (click)="onCancel()" class="!rounded-xl !h-12">Cancel</button>
+          <button type="button" (click)="onCancel()" class="cancel-btn">Cancel</button>
         </div>
       </form>
     </div>
   `,
   styles: [`
-    .error-toast {
-      background: #fff1f2; color: #9f1239; padding: 10px 14px;
-      border-radius: 12px; font-size: 13px;
-      display: flex; align-items: center; border: 1px solid #fecdd3;
+    .alert-error {
+      background: #fff1f2; color: #b91c1c; padding: 10px 14px;
+      border-radius: 8px; font-size: 13px;
+      display: flex; align-items: center; gap: 8px; border: 1px solid #fecaca;
+    }
+    .submit-btn {
+      height: 42px; padding: 0 24px;
+      background: #db2777; color: #ffffff;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600; font-family: inherit;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+      &:hover:not(:disabled) { background: #be185d; }
+      &:disabled { opacity: 0.6; cursor: not-allowed; }
+    }
+    .cancel-btn {
+      height: 42px; padding: 0 20px;
+      background: #ffffff; color: #374151;
+      border: 1.5px solid #d1d5db; border-radius: 8px;
+      font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer;
+      &:hover { background: #f9fafb; }
     }
   `]
 })

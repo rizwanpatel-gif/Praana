@@ -30,67 +30,74 @@ interface QuickVitalRow {
     MatButtonModule, MatIconModule, MatSnackBarModule, MatProgressSpinnerModule,
   ],
   template: `
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
       <div>
-        <h2 class="text-2xl font-bold bg-gradient-to-r from-pink-600 to-rose-500 bg-clip-text text-transparent">Quick Entry</h2>
-        <p class="text-pink-300 text-sm">Record vitals for multiple patients at once</p>
+        <h2 class="text-xl font-bold text-gray-900">Quick Entry</h2>
+        <p class="text-gray-500 text-sm mt-0.5">Record vitals for multiple patients at once</p>
       </div>
-      <button mat-flat-button color="primary" (click)="onSubmitAll()" [disabled]="saving()" class="!rounded-xl !h-12">
+      <button mat-flat-button color="primary" (click)="onSubmitAll()" [disabled]="saving()" class="!rounded-lg !h-11">
         @if (saving()) {
-          <mat-spinner diameter="20"></mat-spinner>
+          <mat-spinner diameter="18"></mat-spinner>
         } @else {
-          <mat-icon>save</mat-icon> Save All Vitals
+          <mat-icon class="!text-base">save</mat-icon> Save All Vitals
         }
       </button>
     </div>
 
     @if (loading()) {
-      <div class="flex justify-center py-12"><mat-spinner></mat-spinner></div>
+      <div class="flex justify-center py-12"><mat-spinner diameter="36"></mat-spinner></div>
     } @else {
-      <div class="glass-card overflow-hidden">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-pink-100">
-              <th class="p-3 text-left text-pink-600 font-semibold">Patient</th>
-              <th class="p-3 text-pink-600 font-semibold">HR</th>
-              <th class="p-3 text-pink-600 font-semibold">Sys BP</th>
-              <th class="p-3 text-pink-600 font-semibold">Dia BP</th>
-              <th class="p-3 text-pink-600 font-semibold">Temp</th>
-              <th class="p-3 text-pink-600 font-semibold">SpO2</th>
-              <th class="p-3 text-pink-600 font-semibold">RR</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (row of rows(); track row.patient.id) {
-              <tr class="border-t border-pink-50 hover:bg-pink-50/30 transition-colors">
-                <td class="p-3">
-                  <div class="font-medium text-gray-700">{{ row.patient.name }}</div>
-                  <div class="text-xs text-pink-400">Bed {{ row.patient.bed_number }}</div>
-                </td>
-                <td class="p-1"><input type="number" class="quick-input" [(ngModel)]="row.heart_rate" [name]="'hr_' + row.patient.id"></td>
-                <td class="p-1"><input type="number" class="quick-input" [(ngModel)]="row.systolic_bp" [name]="'sbp_' + row.patient.id"></td>
-                <td class="p-1"><input type="number" class="quick-input" [(ngModel)]="row.diastolic_bp" [name]="'dbp_' + row.patient.id"></td>
-                <td class="p-1"><input type="number" class="quick-input" [(ngModel)]="row.temperature" [name]="'temp_' + row.patient.id" step="0.1"></td>
-                <td class="p-1"><input type="number" class="quick-input" [(ngModel)]="row.spo2" [name]="'spo2_' + row.patient.id"></td>
-                <td class="p-1"><input type="number" class="quick-input" [(ngModel)]="row.respiratory_rate" [name]="'rr_' + row.patient.id"></td>
+      <div class="prana-card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="text-sm" style="width: 100%; min-width: 520px;">
+            <thead>
+              <tr class="border-b border-gray-200 bg-gray-50">
+                <th class="p-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Patient</th>
+                <th class="p-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">HR</th>
+                <th class="p-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Sys BP</th>
+                <th class="p-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Dia BP</th>
+                <th class="p-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Temp</th>
+                <th class="p-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">SpO2</th>
+                <th class="p-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">RR</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (row of rows(); track row.patient.id) {
+                <tr class="border-t border-gray-100 hover:bg-gray-50">
+                  <td class="p-3">
+                    <div class="font-medium text-gray-800 text-sm">{{ row.patient.name }}</div>
+                    <div class="text-xs text-gray-400">Bed {{ row.patient.bed_number }}</div>
+                  </td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.heart_rate" [name]="'hr_' + row.patient.id"></td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.systolic_bp" [name]="'sbp_' + row.patient.id"></td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.diastolic_bp" [name]="'dbp_' + row.patient.id"></td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.temperature" [name]="'temp_' + row.patient.id" step="0.1"></td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.spo2" [name]="'spo2_' + row.patient.id"></td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.respiratory_rate" [name]="'rr_' + row.patient.id"></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     }
   `,
   styles: [`
     .quick-input {
-      width: 64px; text-align: center;
-      border: 1px solid #fbcfe8; border-radius: 8px;
-      padding: 6px 4px; font-size: 13px;
-      background: rgba(255,255,255,0.7);
-      transition: all 0.2s;
+      width: 68px;
+      text-align: center;
+      border: 1.5px solid #d1d5db;
+      border-radius: 6px;
+      padding: 5px 4px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #374151;
+      background: #ffffff;
+
       &:focus {
         outline: none;
-        border-color: #ec4899;
-        box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        border-color: #db2777;
+        box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.10);
       }
     }
   `]

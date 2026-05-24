@@ -1,10 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -14,125 +10,151 @@ import { Threshold } from '../../../core/models';
 @Component({
   selector: 'app-threshold-config',
   standalone: true,
-  imports: [
-    CommonModule, FormsModule,
-    MatCardModule, MatFormFieldModule, MatInputModule,
-    MatButtonModule, MatIconModule, MatSnackBarModule, MatProgressSpinnerModule,
-  ],
+  imports: [CommonModule, FormsModule, MatIconModule, MatSnackBarModule, MatProgressSpinnerModule],
   template: `
-    <h2 class="text-2xl font-bold bg-gradient-to-r from-pink-600 to-rose-500 bg-clip-text text-transparent mb-1">Alert Thresholds</h2>
-    <p class="text-pink-300 text-sm mb-6">Configure when alerts are triggered for vital signs</p>
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">Alert Thresholds</h2>
+      <p class="text-gray-500 text-sm mt-0.5">Configure when vital sign alerts are triggered</p>
+    </div>
 
     @if (loading()) {
-      <div class="flex justify-center py-12"><mat-spinner></mat-spinner></div>
+      <div class="flex justify-center py-12"><mat-spinner diameter="36"></mat-spinner></div>
     } @else {
-      <div class="glass-card max-w-3xl p-6">
+      <div class="prana-card max-w-2xl">
         <form (ngSubmit)="onSave()">
-          <div class="grid grid-cols-1 gap-6">
-            <div>
-              <h3 class="text-sm font-semibold text-pink-600 uppercase tracking-wider mb-3">
-                <mat-icon class="!text-base align-middle mr-1">favorite</mat-icon> Heart Rate (bpm)
-              </h3>
-              <div class="grid grid-cols-2 gap-4">
-                <mat-form-field appearance="outline">
-                  <mat-label>High</mat-label>
-                  <input matInput type="number" [(ngModel)]="form.heart_rate_high" name="heart_rate_high" step="1">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Low</mat-label>
-                  <input matInput type="number" [(ngModel)]="form.heart_rate_low" name="heart_rate_low" step="1">
-                </mat-form-field>
-              </div>
-            </div>
 
-            <div class="border-t border-pink-100 pt-4">
-              <h3 class="text-sm font-semibold text-pink-600 uppercase tracking-wider mb-3">
-                <mat-icon class="!text-base align-middle mr-1">speed</mat-icon> Systolic BP (mmHg)
-              </h3>
-              <div class="grid grid-cols-2 gap-4">
-                <mat-form-field appearance="outline">
-                  <mat-label>High</mat-label>
-                  <input matInput type="number" [(ngModel)]="form.systolic_bp_high" name="systolic_bp_high" step="1">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Low</mat-label>
-                  <input matInput type="number" [(ngModel)]="form.systolic_bp_low" name="systolic_bp_low" step="1">
-                </mat-form-field>
+          <div class="threshold-section">
+            <p class="threshold-title">
+              <mat-icon class="!text-base text-pink-500">favorite</mat-icon>
+              Heart Rate <span class="unit">(bpm)</span>
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label">High</label>
+                <input class="form-input" type="number" [(ngModel)]="form.heart_rate_high" name="heart_rate_high" step="1">
               </div>
-            </div>
-
-            <div class="border-t border-pink-100 pt-4">
-              <h3 class="text-sm font-semibold text-pink-600 uppercase tracking-wider mb-3">
-                <mat-icon class="!text-base align-middle mr-1">speed</mat-icon> Diastolic BP (mmHg)
-              </h3>
-              <div class="grid grid-cols-2 gap-4">
-                <mat-form-field appearance="outline">
-                  <mat-label>High</mat-label>
-                  <input matInput type="number" [(ngModel)]="form.diastolic_bp_high" name="diastolic_bp_high" step="1">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Low</mat-label>
-                  <input matInput type="number" [(ngModel)]="form.diastolic_bp_low" name="diastolic_bp_low" step="1">
-                </mat-form-field>
-              </div>
-            </div>
-
-            <div class="border-t border-pink-100 pt-4">
-              <h3 class="text-sm font-semibold text-pink-600 uppercase tracking-wider mb-3">
-                <mat-icon class="!text-base align-middle mr-1">thermostat</mat-icon> Temperature (°C)
-              </h3>
-              <div class="grid grid-cols-2 gap-4">
-                <mat-form-field appearance="outline">
-                  <mat-label>High</mat-label>
-                  <input matInput type="number" [(ngModel)]="form.temperature_high" name="temperature_high" step="0.1">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Low</mat-label>
-                  <input matInput type="number" [(ngModel)]="form.temperature_low" name="temperature_low" step="0.1">
-                </mat-form-field>
-              </div>
-            </div>
-
-            <div class="border-t border-pink-100 pt-4">
-              <h3 class="text-sm font-semibold text-pink-600 uppercase tracking-wider mb-3">
-                <mat-icon class="!text-base align-middle mr-1">air</mat-icon> SpO2 (%)
-              </h3>
-              <div class="grid grid-cols-2 gap-4">
-                <mat-form-field appearance="outline">
-                  <mat-label>Low Threshold</mat-label>
-                  <input matInput type="number" [(ngModel)]="form.spo2_low" name="spo2_low" step="1">
-                </mat-form-field>
-              </div>
-            </div>
-
-            <div class="border-t border-pink-100 pt-4">
-              <h3 class="text-sm font-semibold text-pink-600 uppercase tracking-wider mb-3">
-                <mat-icon class="!text-base align-middle mr-1">waves</mat-icon> Respiratory Rate (/min)
-              </h3>
-              <div class="grid grid-cols-2 gap-4">
-                <mat-form-field appearance="outline">
-                  <mat-label>High</mat-label>
-                  <input matInput type="number" [(ngModel)]="form.respiratory_rate_high" name="respiratory_rate_high" step="1">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Low</mat-label>
-                  <input matInput type="number" [(ngModel)]="form.respiratory_rate_low" name="respiratory_rate_low" step="1">
-                </mat-form-field>
+              <div class="form-group">
+                <label class="form-label">Low</label>
+                <input class="form-input" type="number" [(ngModel)]="form.heart_rate_low" name="heart_rate_low" step="1">
               </div>
             </div>
           </div>
 
-          <button mat-flat-button color="primary" type="submit" [disabled]="saving()" class="mt-6 !rounded-xl !h-12 !px-8">
-            @if (saving()) {
-              <mat-spinner diameter="20"></mat-spinner>
-            } @else {
-              Save Thresholds
-            }
-          </button>
+          <div class="threshold-section">
+            <p class="threshold-title">
+              <mat-icon class="!text-base text-blue-500">speed</mat-icon>
+              Systolic BP <span class="unit">(mmHg)</span>
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label">High</label>
+                <input class="form-input" type="number" [(ngModel)]="form.systolic_bp_high" name="systolic_bp_high" step="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Low</label>
+                <input class="form-input" type="number" [(ngModel)]="form.systolic_bp_low" name="systolic_bp_low" step="1">
+              </div>
+            </div>
+          </div>
+
+          <div class="threshold-section">
+            <p class="threshold-title">
+              <mat-icon class="!text-base text-blue-400">speed</mat-icon>
+              Diastolic BP <span class="unit">(mmHg)</span>
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label">High</label>
+                <input class="form-input" type="number" [(ngModel)]="form.diastolic_bp_high" name="diastolic_bp_high" step="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Low</label>
+                <input class="form-input" type="number" [(ngModel)]="form.diastolic_bp_low" name="diastolic_bp_low" step="1">
+              </div>
+            </div>
+          </div>
+
+          <div class="threshold-section">
+            <p class="threshold-title">
+              <mat-icon class="!text-base text-orange-500">thermostat</mat-icon>
+              Temperature <span class="unit">(°C)</span>
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label">High</label>
+                <input class="form-input" type="number" [(ngModel)]="form.temperature_high" name="temperature_high" step="0.1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Low</label>
+                <input class="form-input" type="number" [(ngModel)]="form.temperature_low" name="temperature_low" step="0.1">
+              </div>
+            </div>
+          </div>
+
+          <div class="threshold-section">
+            <p class="threshold-title">
+              <mat-icon class="!text-base text-sky-500">air</mat-icon>
+              SpO2 <span class="unit">(%)</span>
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label">Low Threshold</label>
+                <input class="form-input" type="number" [(ngModel)]="form.spo2_low" name="spo2_low" step="1">
+              </div>
+            </div>
+          </div>
+
+          <div class="threshold-section border-b-0">
+            <p class="threshold-title">
+              <mat-icon class="!text-base text-teal-500">waves</mat-icon>
+              Respiratory Rate <span class="unit">(/min)</span>
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label">High</label>
+                <input class="form-input" type="number" [(ngModel)]="form.respiratory_rate_high" name="respiratory_rate_high" step="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Low</label>
+                <input class="form-input" type="number" [(ngModel)]="form.respiratory_rate_low" name="respiratory_rate_low" step="1">
+              </div>
+            </div>
+          </div>
+
+          <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-[10px]">
+            <button type="submit" [disabled]="saving()" class="submit-btn">
+              @if (saving()) {
+                <mat-spinner diameter="18"></mat-spinner>
+              } @else {
+                Save Thresholds
+              }
+            </button>
+          </div>
         </form>
       </div>
     }
   `,
+  styles: [`
+    .threshold-section {
+      padding: 20px 24px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .threshold-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: #374151;
+      margin: 0 0 16px;
+    }
+    .unit { font-weight: 400; color: #9ca3af; }
+    .submit-btn {
+      height: 42px; padding: 0 24px;
+      background: #db2777; color: #ffffff;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600; font-family: inherit;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+      &:hover:not(:disabled) { background: #be185d; }
+      &:disabled { opacity: 0.6; cursor: not-allowed; }
+    }
+  `]
 })
 export class ThresholdConfigComponent implements OnInit {
   form: Threshold = {
@@ -150,9 +172,7 @@ export class ThresholdConfigComponent implements OnInit {
 
   ngOnInit() {
     this.api.getThresholds().subscribe(res => {
-      if (res.success && res.data) {
-        this.form = { ...res.data };
-      }
+      if (res.success && res.data) this.form = { ...res.data };
       this.loading.set(false);
     });
   }
@@ -161,9 +181,7 @@ export class ThresholdConfigComponent implements OnInit {
     this.saving.set(true);
     this.api.setOrgThresholds(this.form).subscribe({
       next: (res) => {
-        if (res.success) {
-          this.snackBar.open('Thresholds saved', 'OK', { duration: 3000 });
-        }
+        if (res.success) this.snackBar.open('Thresholds saved', 'OK', { duration: 3000 });
         this.saving.set(false);
       },
       error: () => {

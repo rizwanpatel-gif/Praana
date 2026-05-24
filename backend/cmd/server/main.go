@@ -65,6 +65,7 @@ func main() {
 	alertHandler := handlers.NewAlertHandler(alertService)
 	dashboardHandler := handlers.NewDashboardHandler(statsService)
 	wsHandler := handlers.NewWSHandler(wsHub, authService)
+	seedHandler := handlers.NewSeedHandler(repo)
 
 	// Setup Gin
 	r := gin.Default()
@@ -149,6 +150,9 @@ func main() {
 			dashboard.GET("/org-stats", dashboardHandler.OrgStats)
 			dashboard.GET("/usage", dashboardHandler.Usage)
 		}
+
+		// Demo seed (admin only)
+		protected.POST("/seed", middleware.AdminOnly(), seedHandler.Seed)
 	}
 
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)

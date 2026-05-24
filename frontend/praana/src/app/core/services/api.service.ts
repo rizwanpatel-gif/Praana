@@ -6,12 +6,13 @@ import {
   ApiResponse, Patient, Vitals, Alert, Threshold, Invite,
   Org, User, DashboardOverview, ShiftSummary, OrgStats, UsageStats
 } from '../models';
+import { DemoService } from './demo.service';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly api = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private demo: DemoService) {}
 
   // Org
   getOrg(): Observable<ApiResponse<Org>> {
@@ -36,10 +37,12 @@ export class ApiService {
 
   // Patients
   getPatients(): Observable<ApiResponse<Patient[]>> {
+    if (this.demo.isActive()) return this.demo.patients();
     return this.http.get<ApiResponse<Patient[]>>(`${this.api}/patients`);
   }
 
   getPatient(id: string): Observable<ApiResponse<{ patient: Patient; latest_vitals: Vitals | null }>> {
+    if (this.demo.isActive()) return this.demo.patient(id);
     return this.http.get<ApiResponse<any>>(`${this.api}/patients/${id}`);
   }
 
@@ -65,12 +68,14 @@ export class ApiService {
   }
 
   getVitalsHistory(patientId: string, range: string = '24h'): Observable<ApiResponse<Vitals[]>> {
+    if (this.demo.isActive()) return this.demo.vitalsHistory(patientId, range);
     const params = new HttpParams().set('range', range);
     return this.http.get<ApiResponse<Vitals[]>>(`${this.api}/patients/${patientId}/vitals`, { params });
   }
 
   // Alerts
   getActiveAlerts(): Observable<ApiResponse<Alert[]>> {
+    if (this.demo.isActive()) return this.demo.activeAlerts();
     return this.http.get<ApiResponse<Alert[]>>(`${this.api}/alerts`);
   }
 
@@ -79,6 +84,7 @@ export class ApiService {
   }
 
   getAlertHistory(): Observable<ApiResponse<Alert[]>> {
+    if (this.demo.isActive()) return this.demo.alertHistory();
     return this.http.get<ApiResponse<Alert[]>>(`${this.api}/alerts/history`);
   }
 
@@ -97,6 +103,7 @@ export class ApiService {
 
   // Dashboard
   getDashboardOverview(): Observable<ApiResponse<DashboardOverview>> {
+    if (this.demo.isActive()) return this.demo.dashboardOverview();
     return this.http.get<ApiResponse<DashboardOverview>>(`${this.api}/dashboard/overview`);
   }
 
@@ -105,14 +112,17 @@ export class ApiService {
   }
 
   getShiftSummary(): Observable<ApiResponse<ShiftSummary>> {
+    if (this.demo.isActive()) return this.demo.shiftSummary();
     return this.http.get<ApiResponse<ShiftSummary>>(`${this.api}/dashboard/shift-summary`);
   }
 
   getOrgStats(): Observable<ApiResponse<OrgStats>> {
+    if (this.demo.isActive()) return this.demo.orgStats();
     return this.http.get<ApiResponse<OrgStats>>(`${this.api}/dashboard/org-stats`);
   }
 
   getUsage(): Observable<ApiResponse<UsageStats>> {
+    if (this.demo.isActive()) return this.demo.usage();
     return this.http.get<ApiResponse<UsageStats>>(`${this.api}/dashboard/usage`);
   }
 }
