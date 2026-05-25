@@ -9,7 +9,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { AuthService } from './core/services/auth.service';
 import { WebSocketService } from './core/services/websocket.service';
-import { DemoService } from './core/services/demo.service';
 
 @Component({
   selector: 'app-root',
@@ -29,12 +28,7 @@ import { DemoService } from './core/services/demo.service';
               <mat-icon class="!text-pink-600 !text-xl">favorite</mat-icon>
             </div>
             <div class="ml-3 min-w-0">
-              <div class="flex items-center gap-1.5">
-                <h1 class="text-base font-bold text-gray-900 leading-tight">Praana</h1>
-                @if (demo.isActive()) {
-                  <span class="demo-chip">DEMO</span>
-                }
-              </div>
+              <h1 class="text-base font-bold text-gray-900 leading-tight">Praana</h1>
               <p class="text-xs text-gray-400 truncate">{{ auth.user()?.name }}</p>
             </div>
           </div>
@@ -184,13 +178,6 @@ import { DemoService } from './core/services/demo.service';
 
     .nav-divider { height: 1px; background: #f3f4f6; margin: 8px 0; }
 
-    .demo-chip {
-      font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
-      padding: 1px 5px; border-radius: 4px;
-      background: #6366f1; color: #fff;
-      flex-shrink: 0;
-    }
-
     .alert-badge {
       margin-left: auto;
       background: #db2777; color: white;
@@ -253,7 +240,6 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     public auth: AuthService,
     public ws: WebSocketService,
-    public demo: DemoService,
     private breakpointObserver: BreakpointObserver,
     private router: Router,
   ) {}

@@ -5,7 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../core/services/api.service';
-import { DemoService } from '../../core/services/demo.service';
 import { Org, OrgStats, UsageStats } from '../../core/models';
 
 @Component({
@@ -16,34 +15,6 @@ import { Org, OrgStats, UsageStats } from '../../core/models';
     <div class="mb-6">
       <h2 class="text-xl font-bold text-gray-900">Organization Settings</h2>
       <p class="text-gray-500 text-sm mt-0.5">Manage your organization configuration</p>
-    </div>
-
-    <!-- Demo data banner -->
-    <div class="demo-banner mb-5" [class.demo-banner--active]="demo.isActive()">
-      <div class="flex items-start gap-3">
-        <mat-icon class="flex-shrink-0 mt-0.5" [class.!text-indigo-500]="!demo.isActive()" [class.!text-emerald-600]="demo.isActive()">
-          {{ demo.isActive() ? 'science' : 'auto_awesome' }}
-        </mat-icon>
-        <div class="min-w-0">
-          <p class="font-semibold text-gray-800 text-sm">
-            {{ demo.isActive() ? 'Demo Mode Active' : 'Load Demo Data' }}
-          </p>
-          <p class="text-gray-500 text-xs mt-0.5">
-            {{ demo.isActive()
-              ? '8 demo patients with 24 h vitals history are shown. Your real data is untouched.'
-              : 'Preview the app with 8 realistic patients, vitals charts, and alerts — no backend changes needed.' }}
-          </p>
-        </div>
-      </div>
-      @if (demo.isActive()) {
-        <button class="seed-btn seed-btn--off" (click)="onDeactivateDemo()">
-          <mat-icon class="!text-base">close</mat-icon> Exit Demo
-        </button>
-      } @else {
-        <button class="seed-btn" (click)="onActivateDemo()">
-          <mat-icon class="!text-base">play_arrow</mat-icon> Load Demo
-        </button>
-      }
     </div>
 
     @if (loading()) {
@@ -134,26 +105,6 @@ import { Org, OrgStats, UsageStats } from '../../core/models';
       font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer;
       &:hover { background: #be185d; }
     }
-    .demo-banner {
-      background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 10px;
-      padding: 16px 20px;
-      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-    }
-    .demo-banner--active {
-      background: #f0fdf4; border-color: #bbf7d0;
-    }
-    .seed-btn {
-      height: 38px; padding: 0 16px;
-      background: #6366f1; color: #ffffff;
-      border: none; border-radius: 8px;
-      font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer;
-      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
-      &:hover { background: #4f46e5; }
-    }
-    .seed-btn--off {
-      background: #6b7280;
-      &:hover { background: #4b5563; }
-    }
   `]
 })
 export class SettingsComponent implements OnInit {
@@ -164,7 +115,6 @@ export class SettingsComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    public demo: DemoService,
     private snackBar: MatSnackBar,
   ) {}
 
@@ -185,15 +135,4 @@ export class SettingsComponent implements OnInit {
     });
   }
 
-  onActivateDemo() {
-    this.demo.activate();
-    this.snackBar.open('Demo mode on — navigate to Dashboard or Patients to see data', 'OK', { duration: 4000 });
-    this.ngOnInit();
-  }
-
-  onDeactivateDemo() {
-    this.demo.deactivate();
-    this.snackBar.open('Demo mode off — showing your real data', 'OK', { duration: 3000 });
-    this.ngOnInit();
-  }
 }
