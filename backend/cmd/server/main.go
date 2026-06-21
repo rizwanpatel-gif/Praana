@@ -1,26 +1,21 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"golang.org/x/crypto/bcrypt"
 
 	_ "praana/docs"
 	"praana/internal/config"
 	"praana/internal/handlers"
 	"praana/internal/middleware"
-	"praana/internal/models"
 	"praana/internal/repository"
 	"praana/internal/services"
-	"praana/internal/utils"
 )
 
 // @title Praana API
@@ -50,8 +45,6 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to connect to Redis")
 	}
 
-	ensureDemoUser(repo)
-
 	// Init WebSocket hub
 	wsHub := services.NewWSHub()
 	go wsHub.Run()
@@ -72,8 +65,6 @@ func main() {
 	alertHandler := handlers.NewAlertHandler(alertService)
 	dashboardHandler := handlers.NewDashboardHandler(statsService)
 	wsHandler := handlers.NewWSHandler(wsHub, authService)
-	seedHandler := handlers.NewSeedHandler(repo)
-
 	// Setup Gin
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware(cfg.CORSOrigins))
@@ -158,8 +149,6 @@ func main() {
 			dashboard.GET("/usage", dashboardHandler.Usage)
 		}
 
-		// Demo seed (admin only)
-		protected.POST("/seed", middleware.AdminOnly(), seedHandler.Seed)
 	}
 
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)
@@ -167,51 +156,4 @@ func main() {
 	if err := r.Run(addr); err != nil {
 		log.Fatal().Err(err).Msg("Server failed")
 	}
-}
-
-func ensureDemoUser(repo *repository.RedisRepo) {
-	const demoEmail = "demo@gmail.com"
-	const demoPassword = "Demo@123"
-
-	ctx := context.Background()
-
-	hashed, err := bcrypt.GenerateFromPassword([]byte(demoPassword), bcrypt.DefaultCost)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to hash demo password")
-		return
-	}
-
-	existing, _ := repo.GetUserByEmail(ctx, demoEmail)
-	if existing != nil {
-		if existing.Password != "" {
-			log.Info().Msg("Demo user already healthy — skipping")
-			return
-		}
-		// Fix broken user: password was never stored due to json:"-" bug
-		existing.Password = string(hashed)
-		if err := repo.CreateUser(ctx, existing); err != nil {
-			log.Error().Err(err).Msg("Failed to fix demo user password")
-		} else {
-			log.Info().Msg("Demo user password fixed")
-		}
-		return
-	}
-
-	orgID := utils.GenerateID()
-	if err := repo.CreateOrg(ctx, &models.Org{
-		ID: orgID, Name: "Demo Hospital", Plan: models.PlanPro,
-		CreatedAt: time.Now().Unix(), UpdatedAt: time.Now().Unix(),
-	}); err != nil {
-		log.Error().Err(err).Msg("Failed to create demo org")
-		return
-	}
-	if err := repo.CreateUser(ctx, &models.User{
-		ID: utils.GenerateID(), Email: demoEmail, Password: string(hashed),
-		Name: "Demo Admin", Role: models.RoleAdmin, OrgID: orgID,
-		CreatedAt: time.Now().Unix(),
-	}); err != nil {
-		log.Error().Err(err).Msg("Failed to create demo user")
-		return
-	}
-	log.Info().Str("email", demoEmail).Msg("Demo user created")
 }

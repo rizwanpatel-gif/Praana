@@ -139,9 +139,15 @@ export class AlertListComponent implements OnInit {
   }
 
   acknowledge(alertId: string) {
+    this.activeAlerts.update(list => list.filter(a => a.id !== alertId));
     this.api.acknowledgeAlert(alertId).subscribe(res => {
       if (res.success) {
         this.snackBar.open('Alert acknowledged', 'OK', { duration: 2000 });
+        this.api.refreshAlertCount();
+        this.api.getAlertHistory().subscribe(h => {
+          if (h.success) this.alertHistory.set(h.data || []);
+        });
+      } else {
         this.loadAlerts();
       }
     });

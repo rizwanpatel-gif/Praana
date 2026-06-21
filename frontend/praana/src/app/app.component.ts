@@ -9,6 +9,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { AuthService } from './core/services/auth.service';
 import { WebSocketService } from './core/services/websocket.service';
+import { ApiService } from './core/services/api.service';
 
 @Component({
   selector: 'app-root',
@@ -51,8 +52,8 @@ import { WebSocketService } from './core/services/websocket.service';
             <a class="nav-item" routerLink="/alerts" routerLinkActive="nav-active" (click)="closeMobile(sidenav)">
               <mat-icon class="nav-icon">notifications_active</mat-icon>
               <span>Alerts</span>
-              @if (ws.alerts().length > 0) {
-                <span class="alert-badge">{{ ws.alerts().length }}</span>
+              @if (api.activeAlertCount() > 0) {
+                <span class="alert-badge">{{ api.activeAlertCount() }}</span>
               }
             </a>
 
@@ -240,12 +241,16 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     public auth: AuthService,
     public ws: WebSocketService,
+    public api: ApiService,
     private breakpointObserver: BreakpointObserver,
     private router: Router,
   ) {}
 
   ngOnInit() {
-    if (this.auth.isLoggedIn()) this.ws.connect();
+    if (this.auth.isLoggedIn()) {
+      this.ws.connect();
+      this.api.refreshAlertCount();
+    }
 
     this.breakpointObserver.observe(['(max-width: 768px)']).subscribe(result => {
       this.isMobile.set(result.matches);

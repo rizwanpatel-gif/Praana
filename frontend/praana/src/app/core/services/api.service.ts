@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -12,7 +12,15 @@ import { DemoService } from './demo.service';
 export class ApiService {
   private readonly api = environment.apiUrl;
 
+  activeAlertCount = signal(0);
+
   constructor(private http: HttpClient, private demo: DemoService) {}
+
+  refreshAlertCount() {
+    this.http.get<ApiResponse<Alert[]>>(`${this.api}/alerts`).subscribe(res => {
+      if (res.success) this.activeAlertCount.set(res.data?.length ?? 0);
+    });
+  }
 
   // Org
   getOrg(): Observable<ApiResponse<Org>> {
@@ -85,14 +93,8 @@ export class ApiService {
     );
   }
 
-  // Alerts — fallback to demo when no alerts exist
   getActiveAlerts(): Observable<ApiResponse<Alert[]>> {
-    return this.http.get<ApiResponse<Alert[]>>(`${this.api}/alerts`).pipe(
-      switchMap(res => {
-        if (res.success && (!res.data || res.data.length === 0)) return this.demo.activeAlerts();
-        return of(res);
-      })
-    );
+    return this.http.get<ApiResponse<Alert[]>>(`${this.api}/alerts`);
   }
 
   acknowledgeAlert(id: string): Observable<ApiResponse<any>> {
