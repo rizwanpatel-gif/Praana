@@ -90,9 +90,4 @@ Frontend starts at `http://localhost:4200`
 ### WebSocket
 - `GET /ws?token=JWT` - Real-time alert stream
 
-## Plan Limits
 
-| Feature | Free | Pro | Enterprise |
-|---------|------|-----|------------|
-| Patients | 20 | 200 | Unlimited |
-| Members | 3 | 20 | Unlimited |
