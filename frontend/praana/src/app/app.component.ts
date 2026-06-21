@@ -103,15 +103,13 @@ import { ApiService } from './core/services/api.service';
             </div>
           }
 
-          <!-- Alert banner -->
+          <!-- Floating alert toast -->
           @if (ws.alerts().length > 0) {
-            <div class="alert-banner">
-              <div class="flex items-center gap-2 min-w-0">
-                <mat-icon class="!text-lg flex-shrink-0">warning</mat-icon>
-                <span class="truncate text-sm font-medium">{{ ws.alerts()[0].message }}</span>
-              </div>
-              <button mat-icon-button class="!text-white flex-shrink-0" (click)="ws.clearAlert(ws.alerts()[0].id)">
-                <mat-icon>close</mat-icon>
+            <div class="alert-toast">
+              <mat-icon class="!text-lg flex-shrink-0">warning</mat-icon>
+              <span class="alert-toast-msg">{{ formatBannerMsg(ws.alerts()[0].message) }}</span>
+              <button class="alert-toast-close" (click)="ws.clearAlert(ws.alerts()[0].id)">
+                <mat-icon class="!text-base">close</mat-icon>
               </button>
             </div>
           }
@@ -219,11 +217,33 @@ import { ApiService } from './core/services/api.service';
       display: flex; align-items: center; justify-content: center;
     }
 
-    .alert-banner {
+    .alert-toast {
+      position: fixed;
+      top: 30px; left: 50%; transform: translateX(-50%);
+      z-index: 1000;
       background: #db2777; color: white;
-      padding: 10px 20px;
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 8px;
+      padding: 12px 16px 12px 20px;
+      border-radius: 50px;
+      box-shadow: 0 8px 24px rgba(219,39,119,0.35), 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; gap: 10px;
+      max-width: calc(100vw - 48px);
+      animation: slideUp 0.25s ease;
+    }
+    .alert-toast-msg {
+      font-size: 13px; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .alert-toast-close {
+      background: rgba(255,255,255,0.2); border: none; cursor: pointer;
+      color: white; border-radius: 50%;
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; padding: 0;
+      &:hover { background: rgba(255,255,255,0.3); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
     }
 
     .page-content {
@@ -263,5 +283,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   closeMobile(sidenav: MatSidenav) {
     if (this.isMobile()) sidenav.close();
+  }
+
+  formatBannerMsg(msg: string): string {
+    return msg.replace(/_/g, ' ').replace(/\b(\d+)\.0\b/g, '$1');
   }
 }

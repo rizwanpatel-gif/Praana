@@ -52,7 +52,7 @@ import { format } from 'date-fns';
                       <span class="status-badge" [class]="alert.severity === 'critical' ? 'status-critical' : 'status-warning'">
                         {{ alert.severity }}
                       </span>
-                      <span class="font-medium text-gray-800 text-sm">{{ alert.message }}</span>
+                      <span class="font-medium text-gray-800 text-sm">{{ formatMsg(alert.message) }}</span>
                     </div>
                     <p class="text-xs text-gray-400 mt-1">
                       <a [routerLink]="['/patients', alert.patient_id]" class="text-pink-600 hover:text-pink-800 font-medium">
@@ -130,7 +130,10 @@ export class AlertListComponent implements OnInit {
 
   loadAlerts() {
     this.api.getActiveAlerts().subscribe(res => {
-      if (res.success) this.activeAlerts.set(res.data || []);
+      if (res.success) {
+        this.activeAlerts.set(res.data || []);
+        this.api.activeAlertCount.set(res.data?.length ?? 0);
+      }
       this.loading.set(false);
     });
     this.api.getAlertHistory().subscribe(res => {
@@ -151,6 +154,10 @@ export class AlertListComponent implements OnInit {
         this.loadAlerts();
       }
     });
+  }
+
+  formatMsg(msg: string): string {
+    return msg.replace(/_/g, ' ').replace(/\b(\d+)\.0\b/g, '$1');
   }
 
   formatTime(ts: number): string {

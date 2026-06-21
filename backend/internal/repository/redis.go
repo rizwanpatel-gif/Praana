@@ -399,9 +399,19 @@ func (r *RedisRepo) GetActiveAlerts(ctx context.Context, orgID string) ([]models
 		return nil, err
 	}
 	var active []models.Alert
+	seen := make(map[string]bool)
 	for _, a := range alerts {
-		if !a.Acknowledged {
-			active = append(active, a)
+		if seen[a.ID] {
+			continue
+		}
+		seen[a.ID] = true
+		// Re-fetch by key to get current acknowledged state
+		current, err := r.GetAlert(ctx, orgID, a.ID)
+		if err != nil || current == nil {
+			continue
+		}
+		if !current.Acknowledged {
+			active = append(active, *current)
 		}
 	}
 	return active, nil
