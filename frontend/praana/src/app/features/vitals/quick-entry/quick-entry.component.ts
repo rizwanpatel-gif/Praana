@@ -68,12 +68,12 @@ interface QuickVitalRow {
                     <div class="font-medium text-gray-800 text-sm">{{ row.patient.name }}</div>
                     <div class="text-xs text-gray-400">Bed {{ row.patient.bed_number }}</div>
                   </td>
-                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.heart_rate" [name]="'hr_' + row.patient.id"></td>
-                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.systolic_bp" [name]="'sbp_' + row.patient.id"></td>
-                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.diastolic_bp" [name]="'dbp_' + row.patient.id"></td>
-                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.temperature" [name]="'temp_' + row.patient.id" step="0.1"></td>
-                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.spo2" [name]="'spo2_' + row.patient.id"></td>
-                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.respiratory_rate" [name]="'rr_' + row.patient.id"></td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.heart_rate" [name]="'hr_' + row.patient.id" min="0" max="300"></td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.systolic_bp" [name]="'sbp_' + row.patient.id" min="0" max="300"></td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.diastolic_bp" [name]="'dbp_' + row.patient.id" min="0" max="200"></td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.temperature" [name]="'temp_' + row.patient.id" min="30" max="45" step="0.1"></td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.spo2" [name]="'spo2_' + row.patient.id" min="0" max="100"></td>
+                  <td class="p-2 text-center"><input type="number" class="quick-input" [(ngModel)]="row.respiratory_rate" [name]="'rr_' + row.patient.id" min="0" max="60"></td>
                 </tr>
               }
             </tbody>

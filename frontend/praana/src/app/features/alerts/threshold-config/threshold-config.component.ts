@@ -31,11 +31,11 @@ import { Threshold } from '../../../core/models';
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="form-group">
                 <label class="form-label">High</label>
-                <input class="form-input" type="number" [(ngModel)]="form.heart_rate_high" name="heart_rate_high" step="1">
+                <input class="form-input" type="number" [(ngModel)]="form.heart_rate_high" name="heart_rate_high" step="1" min="0" max="300">
               </div>
               <div class="form-group">
                 <label class="form-label">Low</label>
-                <input class="form-input" type="number" [(ngModel)]="form.heart_rate_low" name="heart_rate_low" step="1">
+                <input class="form-input" type="number" [(ngModel)]="form.heart_rate_low" name="heart_rate_low" step="1" min="0" max="300">
               </div>
             </div>
           </div>
@@ -48,11 +48,11 @@ import { Threshold } from '../../../core/models';
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="form-group">
                 <label class="form-label">High</label>
-                <input class="form-input" type="number" [(ngModel)]="form.systolic_bp_high" name="systolic_bp_high" step="1">
+                <input class="form-input" type="number" [(ngModel)]="form.systolic_bp_high" name="systolic_bp_high" step="1" min="0" max="300">
               </div>
               <div class="form-group">
                 <label class="form-label">Low</label>
-                <input class="form-input" type="number" [(ngModel)]="form.systolic_bp_low" name="systolic_bp_low" step="1">
+                <input class="form-input" type="number" [(ngModel)]="form.systolic_bp_low" name="systolic_bp_low" step="1" min="0" max="300">
               </div>
             </div>
           </div>
@@ -65,11 +65,11 @@ import { Threshold } from '../../../core/models';
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="form-group">
                 <label class="form-label">High</label>
-                <input class="form-input" type="number" [(ngModel)]="form.diastolic_bp_high" name="diastolic_bp_high" step="1">
+                <input class="form-input" type="number" [(ngModel)]="form.diastolic_bp_high" name="diastolic_bp_high" step="1" min="0" max="200">
               </div>
               <div class="form-group">
                 <label class="form-label">Low</label>
-                <input class="form-input" type="number" [(ngModel)]="form.diastolic_bp_low" name="diastolic_bp_low" step="1">
+                <input class="form-input" type="number" [(ngModel)]="form.diastolic_bp_low" name="diastolic_bp_low" step="1" min="0" max="200">
               </div>
             </div>
           </div>
@@ -82,11 +82,11 @@ import { Threshold } from '../../../core/models';
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="form-group">
                 <label class="form-label">High</label>
-                <input class="form-input" type="number" [(ngModel)]="form.temperature_high" name="temperature_high" step="0.1">
+                <input class="form-input" type="number" [(ngModel)]="form.temperature_high" name="temperature_high" step="0.1" min="30" max="45">
               </div>
               <div class="form-group">
                 <label class="form-label">Low</label>
-                <input class="form-input" type="number" [(ngModel)]="form.temperature_low" name="temperature_low" step="0.1">
+                <input class="form-input" type="number" [(ngModel)]="form.temperature_low" name="temperature_low" step="0.1" min="30" max="45">
               </div>
             </div>
           </div>
@@ -99,7 +99,7 @@ import { Threshold } from '../../../core/models';
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="form-group">
                 <label class="form-label">Low Threshold</label>
-                <input class="form-input" type="number" [(ngModel)]="form.spo2_low" name="spo2_low" step="1">
+                <input class="form-input" type="number" [(ngModel)]="form.spo2_low" name="spo2_low" step="1" min="0" max="100">
               </div>
             </div>
           </div>
@@ -112,11 +112,11 @@ import { Threshold } from '../../../core/models';
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="form-group">
                 <label class="form-label">High</label>
-                <input class="form-input" type="number" [(ngModel)]="form.respiratory_rate_high" name="respiratory_rate_high" step="1">
+                <input class="form-input" type="number" [(ngModel)]="form.respiratory_rate_high" name="respiratory_rate_high" step="1" min="0" max="60">
               </div>
               <div class="form-group">
                 <label class="form-label">Low</label>
-                <input class="form-input" type="number" [(ngModel)]="form.respiratory_rate_low" name="respiratory_rate_low" step="1">
+                <input class="form-input" type="number" [(ngModel)]="form.respiratory_rate_low" name="respiratory_rate_low" step="1" min="0" max="60">
               </div>
             </div>
           </div>
