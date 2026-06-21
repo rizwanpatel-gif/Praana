@@ -65,8 +65,15 @@ func (r *RedisRepo) UpdateOrg(ctx context.Context, org *models.Org) error {
 
 // ============ USER ============
 
+// userRecord is the Redis storage shape — includes password which json:"-" excludes from API responses.
+type userRecord struct {
+	models.User
+	HashedPassword string `json:"hashed_password"`
+}
+
 func (r *RedisRepo) CreateUser(ctx context.Context, user *models.User) error {
-	data, _ := json.Marshal(user)
+	record := userRecord{User: *user, HashedPassword: user.Password}
+	data, _ := json.Marshal(record)
 	pipe := r.client.Pipeline()
 	pipe.Set(ctx, fmt.Sprintf("user:%s", user.ID), data, 0)
 	pipe.Set(ctx, fmt.Sprintf("user_email:%s", user.Email), user.ID, 0)
@@ -83,8 +90,13 @@ func (r *RedisRepo) GetUser(ctx context.Context, userID string) (*models.User, e
 	if err != nil {
 		return nil, err
 	}
-	var user models.User
-	return &user, json.Unmarshal(data, &user)
+	var record userRecord
+	if err := json.Unmarshal(data, &record); err != nil {
+		return nil, err
+	}
+	user := record.User
+	user.Password = record.HashedPassword
+	return &user, nil
 }
 
 func (r *RedisRepo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
